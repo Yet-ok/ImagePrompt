@@ -52,7 +52,11 @@ export function NavBar({
       }`}
     >
       <div className="container flex h-16 items-center justify-between py-4">
-        <MainNav items={items} params={{ lang: `${lang}` }} marketing={marketing}>
+        <MainNav
+          items={items}
+          params={{ lang: `${lang}` }}
+          marketing={marketing}
+        >
           {children}
         </MainNav>
 

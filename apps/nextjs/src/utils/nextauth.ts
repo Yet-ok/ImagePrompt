@@ -2,7 +2,7 @@ import { match as matchLocale } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
 import { getToken } from "next-auth/jwt";
 import { withAuth } from "next-auth/middleware";
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 import { i18n } from "~/config/i18n-config";
 

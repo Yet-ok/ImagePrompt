@@ -1,7 +1,11 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { createTRPCProxyClient, loggerLink, TRPCClientError } from "@trpc/client";
+import {
+  createTRPCProxyClient,
+  loggerLink,
+  TRPCClientError,
+} from "@trpc/client";
 
 import { AppRouter } from "@saasfly/api";
 
@@ -18,14 +22,13 @@ type AuthObject = Awaited<ReturnType<typeof auth>>;
 export const createTRPCContext = async (opts: {
   headers: Headers;
   auth: AuthObject;
-// eslint-disable-next-line @typescript-eslint/require-await
+  // eslint-disable-next-line @typescript-eslint/require-await
 }) => {
   return {
     userId: opts.auth.userId,
     ...opts,
   };
 };
-
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -54,7 +57,7 @@ export const trpc = createTRPCProxyClient<AppRouter>({
      * Components always run on the server, we can just call the procedure as a function.
      */
     () =>
-      ({op}) =>
+      ({ op }) =>
         observable((observer) => {
           createContext()
             .then((ctx) => {
@@ -67,7 +70,7 @@ export const trpc = createTRPCProxyClient<AppRouter>({
               });
             })
             .then((data) => {
-              observer.next({result: {data}});
+              observer.next({ result: { data } });
               observer.complete();
             })
             .catch((cause: TRPCErrorResponse) => {
@@ -76,4 +79,4 @@ export const trpc = createTRPCProxyClient<AppRouter>({
         }),
   ],
 });
-export {type RouterInputs, type RouterOutputs} from "@saasfly/api";
+export { type RouterInputs, type RouterOutputs } from "@saasfly/api";

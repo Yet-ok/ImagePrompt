@@ -1,27 +1,27 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { Button } from '@saasfly/ui/button'
+import { useEffect } from "react";
+import { Button } from "@saasfly/ui/button";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   const handleReset = () => {
-    reset()
-  }
+    reset();
+  };
 
   const handleGoHome = () => {
-    window.location.href = '/'
-  }
+    window.location.href = "/";
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -30,21 +30,16 @@ export default function Error({
           Something went wrong!
         </h2>
         <p className="mb-6 text-gray-600 dark:text-gray-400">
-          We apologize for the inconvenience. An error occurred while loading this page.
+          We apologize for the inconvenience. An error occurred while loading
+          this page.
         </p>
-        <Button
-          onClick={handleReset}
-          className="mr-2"
-        >
+        <Button onClick={handleReset} className="mr-2">
           Try again
         </Button>
-        <Button
-          variant="outline"
-          onClick={handleGoHome}
-        >
+        <Button variant="outline" onClick={handleGoHome}>
           Go home
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -38,10 +38,14 @@ jobs:
 
       - name: Copy env
         shell: bash
-        run: cp .env.example .env.local
+        run: |
+          cp .env.example .env.local
+          echo "POSTGRES_URL=postgres://default:default@localhost:5432/verceldb" >> .env.local
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Install lib
         run: bun i
@@ -50,7 +54,7 @@ jobs:
         run: bun run build
         env:
           # The hostname used to communicate with the PostgreSQL service container
-          POSTGRES_HOST: postgres
+          POSTGRES_HOST: localhost
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
           POSTGRES_USER: default
@@ -60,4 +64,4 @@ jobs:
 
 
       - name: lint and type-check
-        run: bun run build lint format typecheck
+        run: bun run lint && bun run format && bun run typecheck

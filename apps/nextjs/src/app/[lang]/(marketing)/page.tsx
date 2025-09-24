@@ -3,7 +3,13 @@ import Image from "next/image";
 import { getDictionary } from "~/lib/get-dictionary";
 
 import { Button } from "@saasfly/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@saasfly/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@saasfly/ui/card";
 import * as Icons from "@saasfly/ui/icons";
 
 import type { Locale } from "~/config/i18n-config";
@@ -34,7 +40,10 @@ export default async function IndexPage({
             <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg text-lg">
               开始创作
             </Button>
-            <Button variant="outline" className="border-gray-400 text-gray-300 hover:bg-gray-800 px-8 py-3 rounded-lg text-lg">
+            <Button
+              variant="outline"
+              className="border-gray-400 text-gray-300 hover:bg-gray-800 px-8 py-3 rounded-lg text-lg"
+            >
               了解更多
             </Button>
           </div>
@@ -97,9 +106,11 @@ export default async function IndexPage({
       {/* AI驱动的图片提示词工具 */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">AI驱动的图片提示词工具</h2>
+          <h2 className="text-4xl font-bold text-white mb-4">
+            AI驱动的图片提示词工具
+          </h2>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h3 className="text-2xl font-bold text-white mb-4">图片转提示词</h3>
@@ -136,7 +147,9 @@ export default async function IndexPage({
                     <Icons.User className="w-4 h-4 text-white" />
                   </div>
                   <div className="bg-slate-700 rounded-lg p-3 flex-1">
-                    <p className="text-white text-sm">请生成一个科幻风格的提示词</p>
+                    <p className="text-white text-sm">
+                      请生成一个科幻风格的提示词
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -145,9 +158,9 @@ export default async function IndexPage({
                   </div>
                   <div className="bg-purple-900/50 rounded-lg p-3 flex-1">
                     <p className="text-white text-sm">
-                      futuristic cityscape, neon lights, cyberpunk style, 
-                      high-tech architecture, flying cars, digital art, 
-                      ultra detailed, 8k resolution
+                      futuristic cityscape, neon lights, cyberpunk style,
+                      high-tech architecture, flying cars, digital art, ultra
+                      detailed, 8k resolution
                     </p>
                   </div>
                 </div>
@@ -155,7 +168,9 @@ export default async function IndexPage({
             </div>
           </div>
           <div className="order-1 lg:order-2">
-            <h3 className="text-2xl font-bold text-white mb-4">图片提示词生成器</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              图片提示词生成器
+            </h3>
             <p className="text-gray-300 mb-6">
               描述您想要的图片风格，AI将为您生成专业的提示词，适用于各种AI绘画工具。
             </p>
@@ -217,7 +232,9 @@ export default async function IndexPage({
             </div>
           </div>
           <div className="order-1 lg:order-2">
-            <h3 className="text-2xl font-bold text-white mb-4">AI图片描述生成器</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              AI图片描述生成器
+            </h3>
             <p className="text-gray-300 mb-6">
               上传图片，获得详细的AI生成描述。完美适用于内容创作、SEO优化和无障碍访问。
             </p>

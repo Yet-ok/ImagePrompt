@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Button } from '@saasfly/ui/button'
+import Link from "next/link";
+import { Button } from "@saasfly/ui/button";
 
 export default function NotFound() {
   const handleGoBack = () => {
-    window.history.back()
-  }
+    window.history.back();
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -22,9 +22,7 @@ export default function NotFound() {
         </p>
         <div className="flex gap-2 justify-center">
           <Button asChild>
-            <Link href="/">
-              Go Home
-            </Link>
+            <Link href="/">Go Home</Link>
           </Button>
           <Button variant="outline" onClick={handleGoBack}>
             Go Back
@@ -32,5 +30,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }

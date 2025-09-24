@@ -29,7 +29,9 @@ export const SignInModal = ({ dict }: { dict: Record<string, string> }) => {
             />
           </a>
           <h3 className="font-urban text-2xl font-bold">{dict.signup}</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">{dict.privacy}</p>
+          <p className="text-sm text-gray-500 dark:text-zinc-400">
+            {dict.privacy}
+          </p>
         </div>
 
         <div className="flex flex-col space-y-4 px-4 py-8 md:px-16">

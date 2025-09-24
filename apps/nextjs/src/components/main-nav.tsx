@@ -18,7 +18,12 @@ interface MainNavProps {
   marketing?: Record<string, string | object>;
 }
 
-export function MainNav({ items, children, params: { lang }, marketing }: MainNavProps) {
+export function MainNav({
+  items,
+  children,
+  params: { lang },
+  marketing,
+}: MainNavProps) {
   const [showMobileMenu, setShowMobileMenu] = React.useState<boolean>(false);
   const toggleMenu = () => {
     setShowMobileMenu(!showMobileMenu);
@@ -29,7 +34,10 @@ export function MainNav({ items, children, params: { lang }, marketing }: MainNa
   return (
     <div className="flex gap-6 md:gap-10">
       <div className="flex items-center">
-        <Link href={`/${lang}`} className="hidden items-center space-x-2 md:flex">
+        <Link
+          href={`/${lang}`}
+          className="hidden items-center space-x-2 md:flex"
+        >
           <Icons.Image className="w-8 h-8 text-purple-600" />
           <div className="text-2xl font-bold text-purple-600">ImagePrompt</div>
         </Link>
@@ -39,7 +47,7 @@ export function MainNav({ items, children, params: { lang }, marketing }: MainNa
         className="flex items-center space-x-2 md:hidden"
         onClick={() => setShowMobileMenu(!showMobileMenu)}
       >
-        {showMobileMenu ? <Icons.Close/> : <Icons.Logo/>}
+        {showMobileMenu ? <Icons.Close /> : <Icons.Logo />}
         <span className="font-bold">Menu</span>
       </button>
       {showMobileMenu && items && (
