@@ -28,6 +28,7 @@ export const Moon = Lucide.Moon;
 export const Organization = Lucide.Building;
 export const Page = Lucide.File;
 export const Post = Lucide.FileText;
+export const FileText = Lucide.FileText;
 export const Rocket = Lucide.Rocket;
 export const Search = Lucide.Search;
 export const Settings = Lucide.Settings;
@@ -39,6 +40,11 @@ export const Trash = Lucide.Trash;
 export const Twitter = Lucide.Twitter;
 export const User = Lucide.User;
 export const Warning = Lucide.AlertTriangle;
+export const Sparkles = Lucide.Sparkles;
+export const Image = Lucide.Image;
+export const Palette = Lucide.Palette;
+export const Bot = Lucide.Bot;
+export const Zap = Lucide.Zap;
 
 export const System: Icon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>

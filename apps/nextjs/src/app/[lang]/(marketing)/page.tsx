@@ -2,60 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { getDictionary } from "~/lib/get-dictionary";
 
-import { CodeCopy } from "~/components/code-copy";
-import { Comments } from "~/components/comments";
-import { FeaturesGrid } from "~/components/features-grid";
-import { RightsideMarketing } from "~/components/rightside-marketing";
-
-import { AnimatedTooltip } from "@saasfly/ui/animated-tooltip";
-import { BackgroundLines } from "@saasfly/ui/background-lines";
 import { Button } from "@saasfly/ui/button";
-import { ColourfulText } from "@saasfly/ui/colorful-text";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@saasfly/ui/card";
 import * as Icons from "@saasfly/ui/icons";
 
 import type { Locale } from "~/config/i18n-config";
-import {VideoScroll} from "~/components/video-scroll";
-
-const people = [
-  {
-    id: 1,
-    name: "tianzx",
-    designation: "CEO at Nextify",
-    image: "https://avatars.githubusercontent.com/u/10096899",
-    link: "https://x.com/nextify2024",
-  },
-  {
-    id: 2,
-    name: "jackc3",
-    designation: "Co-founder at Nextify",
-    image: "https://avatars.githubusercontent.com/u/10334353",
-    link: "https://x.com/BingxunYao",
-  },
-  {
-    id: 3,
-    name: "imesong",
-    designation: "Contributor",
-    image: "https://avatars.githubusercontent.com/u/3849293",
-  },
-  {
-    id: 4,
-    name: "ziveen",
-    designation: "Contributor",
-    image: "https://avatars.githubusercontent.com/u/22560152",
-  },
-  {
-    id: 5,
-    name: "Zenuncl",
-    designation: "Independent Software Developer",
-    image: "https://avatars.githubusercontent.com/u/3316062",
-  },
-  {
-    id: 6,
-    name: "Innei",
-    designation: "Indie Developer",
-    image: "https://avatars.githubusercontent.com/u/41265413",
-  },
-];
 
 export default async function IndexPage({
   params: { lang },
@@ -67,116 +18,215 @@ export default async function IndexPage({
   const dict = await getDictionary(lang);
 
   return (
-    <>
-      <section className="container">
-        <div className="grid grid-cols-1 gap-10 xl:grid-cols-2">
-          <div className="flex flex-col items-start h-full">
-            <BackgroundLines className="h-full">
-              <div className="flex flex-col pt-4 md:pt-36 lg:pt-36 xl:pt-36">
-                <div className="mt-20">
-                  <div
-                    className="mb-6 max-w-4xl text-left text-4xl font-semibold dark:text-zinc-100 md:text-5xl xl:text-5xl md:leading-[4rem] xl:leading-[4rem]">
-                    {dict.marketing.title || "Ship your apps to the world easier with "}
-                    <ColourfulText text="Saasfly"/>
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <span className="text-neutral-500 dark:text-neutral-400 sm:text-lg">
-                    {dict.marketing.sub_title || "Your complete All-in-One solution for building SaaS services."}
-                  </span>
-                </div>
-
-                <div
-                  className="mb-4 mt-6 flex w-full flex-col justify-center space-y-4 sm:flex-row sm:justify-start sm:space-x-8 sm:space-y-0 z-10">
-                  <Link href="https://github.com/saasfly/saasfly" target="_blank">
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-full text-lg px-6 h-12 font-medium">
-                      {dict.marketing.get_started}
-                      <Icons.ArrowRight className="h-5 w-5"/>
-                    </Button>
-                  </Link>
-
-                  <CodeCopy/>
-                </div>
-
-                <div className="flex xl:flex-row flex-col items-center justify-start mt-4 w-full">
-                  <div className="flex">
-                    <AnimatedTooltip items={people}/>
-                  </div>
-                  <div className="flex flex-col items-center justify-start ml-8">
-                    <div className="w-[340px]">
-                      <span className="font-semibold">9 </span>
-                      <span className="text-neutral-500 dark:text-neutral-400">{dict.marketing.contributors.contributors_desc}</span>
-                    </div>
-                    <div className="w-[340px]">
-                      <span
-                        className="text-neutral-500 dark:text-neutral-400">{dict.marketing.contributors.developers_first}</span>
-                      <ColourfulText text="2000"/>
-                      <span
-                        className="text-neutral-500 dark:text-neutral-400">{dict.marketing.contributors.developers_second}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </BackgroundLines>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* 主标题区域 */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            使用图片提示词创作更
+            <br />
+            好的AI艺术
+          </h1>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            利用强大的AI工具，将您的创意转化为令人惊叹的艺术作品
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg text-lg">
+              开始创作
+            </Button>
+            <Button variant="outline" className="border-gray-400 text-gray-300 hover:bg-gray-800 px-8 py-3 rounded-lg text-lg">
+              了解更多
+            </Button>
           </div>
+        </div>
+      </section>
 
-          <div className="hidden h-full w-full xl:block bg-background">
-            <div className="flex flex-col pt-44">
-              <RightsideMarketing dict={dict.marketing.right_side}/>
+      {/* 功能卡片区域 */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
+            <CardHeader className="text-center">
+              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Icons.Image className="w-6 h-6 text-white" />
+              </div>
+              <CardTitle className="text-white">图片转提示词</CardTitle>
+              <CardDescription className="text-gray-400">
+                将图片转换为提示词，以生成您自己的图片
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
+            <CardHeader className="text-center">
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Icons.Zap className="w-6 h-6 text-white" />
+              </div>
+              <CardTitle className="text-white">魔法增强</CardTitle>
+              <CardDescription className="text-gray-400">
+                将简单文本转化为详细、描述性的图片提示词
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
+            <CardHeader className="text-center">
+              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Icons.Bot className="w-6 h-6 text-white" />
+              </div>
+              <CardTitle className="text-white">AI图片描述生成器</CardTitle>
+              <CardDescription className="text-gray-400">
+                让AI帮助您详细理解和分析任何图片
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
+            <CardHeader className="text-center">
+              <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Icons.Palette className="w-6 h-6 text-white" />
+              </div>
+              <CardTitle className="text-white">AI图片生成器</CardTitle>
+              <CardDescription className="text-gray-400">
+                描述您的图片提示词，我们将为您生成图片
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </section>
+
+      {/* AI驱动的图片提示词工具 */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-white mb-4">AI驱动的图片提示词工具</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-4">图片转提示词</h3>
+            <p className="text-gray-300 mb-6">
+              上传任何图片，我们的AI将分析并生成详细的提示词，帮助您重现或改进图片风格。
+            </p>
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+              立即尝试
+            </Button>
+          </div>
+          <div className="relative">
+            <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+              <div className="w-full h-48 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-4 flex items-center justify-center">
+                <Icons.Image className="w-16 h-16 text-white/50" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 bg-slate-600 rounded w-3/4"></div>
+                <div className="h-3 bg-slate-600 rounded w-1/2"></div>
+                <div className="h-3 bg-slate-600 rounded w-5/6"></div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="container mt-8 md:mt-[-180px] xl:mt-[-180px]">
-        <FeaturesGrid dict={dict.marketing.features_grid}/>
-      </section>
-
-      <section className="container pt-24">
-        <div className="flex flex-col justify-center items-center pt-10">
-          <div className="text-lg text-neutral-500 dark:text-neutral-400">{dict.marketing.sponsor.title}</div>
-          <div className="mt-4 flex items-center gap-4">
-            <Link href="https://go.clerk.com/uKDp7Au" target="_blank">
-              <Image src="/images/clerk.png" width="48" height="48" alt="twillot"/>
-            </Link>
-            <Link href="https://www.twillot.com/" target="_blank">
-              <Image src="https://www.twillot.com/logo-128.png" width="48" height="48" alt="twillot"/>
-            </Link>
-            <Link href="https://www.setupyourpay.com/" target="_blank">
-              <Image src="https://www.setupyourpay.com/logo.png" width="48" height="48" alt="setupyourpay" />
-            </Link>
-            <Link href="https://opencollective.com/saasfly" target="_blank">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:bg-accent dark:hover:bg-neutral-800/30">
-                <Icons.Heart className="w-5 h-5 fill-pink-600 text-pink-600 dark:fill-pink-700 dark:text-pink-700" />
-                <span className="text-sm font-medium text-neutral-500 dark:text-neutral-200">{dict.marketing.sponsor.donate || ''}</span>
+      {/* 图片提示词生成器 */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="relative order-2 lg:order-1">
+            <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <Icons.User className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="bg-slate-700 rounded-lg p-3 flex-1">
+                    <p className="text-white text-sm">请生成一个科幻风格的提示词</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Icons.Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="bg-purple-900/50 rounded-lg p-3 flex-1">
+                    <p className="text-white text-sm">
+                      futuristic cityscape, neon lights, cyberpunk style, 
+                      high-tech architecture, flying cars, digital art, 
+                      ultra detailed, 8k resolution
+                    </p>
+                  </div>
+                </div>
               </div>
-            </Link>
+            </div>
+          </div>
+          <div className="order-1 lg:order-2">
+            <h3 className="text-2xl font-bold text-white mb-4">图片提示词生成器</h3>
+            <p className="text-gray-300 mb-6">
+              描述您想要的图片风格，AI将为您生成专业的提示词，适用于各种AI绘画工具。
+            </p>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              开始生成
+            </Button>
           </div>
         </div>
       </section>
 
-      <section className="container pt-8">
-        <VideoScroll dict={dict.marketing.video}/>
-      </section>
-
-      <section className="w-full px-8 pt-10 sm:px-0 sm:pt-24 md:px-0 md:pt-24 xl:px-0 xl:pt-24">
-        <div className="flex h-full w-full flex-col items-center pb-[100px] pt-10">
+      {/* AI图片生成器 */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h1 className="mb-6 text-center text-3xl font-bold dark:text-zinc-100 md:text-5xl">
-              {dict.marketing.people_comment.title}
-            </h1>
+            <h3 className="text-2xl font-bold text-white mb-4">AI图片生成器</h3>
+            <p className="text-gray-300 mb-6">
+              使用我们的AI图片生成器，直接从提示词创建令人惊叹的艺术作品。支持多种风格和分辨率。
+            </p>
+            <Button className="bg-green-600 hover:bg-green-700 text-white">
+              立即生成
+            </Button>
           </div>
-          <div className="mb-6 text-lg text-neutral-500 dark:text-neutral-400">
-            {dict.marketing.people_comment.desc}
-          </div>
-
-          <div className="w-full overflow-x-hidden">
-            <Comments/>
+          <div className="relative">
+            <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="w-full h-32 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+                  <Icons.Sparkles className="w-8 h-8 text-white/50" />
+                </div>
+                <div className="w-full h-32 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg flex items-center justify-center">
+                  <Icons.Palette className="w-8 h-8 text-white/50" />
+                </div>
+                <div className="w-full h-32 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                  <Icons.Image className="w-8 h-8 text-white/50" />
+                </div>
+                <div className="w-full h-32 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-lg flex items-center justify-center">
+                  <Icons.Zap className="w-8 h-8 text-white/50" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-    </>
+
+      {/* AI图片描述生成器 */}
+      <section className="container mx-auto px-4 py-16 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="relative order-2 lg:order-1">
+            <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+              <div className="w-full h-48 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg mb-4 flex items-center justify-center">
+                <Icons.FileText className="w-16 h-16 text-white/50" />
+              </div>
+              <div className="space-y-3">
+                <h4 className="text-white font-semibold">AI生成的描述：</h4>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  这是一幅充满未来感的数字艺术作品，展现了一个霓虹灯闪烁的赛博朋克城市景观。
+                  高耸的摩天大楼被五彩斑斓的光线照亮，飞行汽车在空中穿梭...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="order-1 lg:order-2">
+            <h3 className="text-2xl font-bold text-white mb-4">AI图片描述生成器</h3>
+            <p className="text-gray-300 mb-6">
+              上传图片，获得详细的AI生成描述。完美适用于内容创作、SEO优化和无障碍访问。
+            </p>
+            <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+              生成描述
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
