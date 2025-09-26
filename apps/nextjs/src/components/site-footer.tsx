@@ -9,8 +9,11 @@ function getCopyrightText(
   dict: Record<string, string | Record<string, string>>,
 ) {
   const currentYear = new Date().getFullYear();
-  const copyrightTemplate = String(dict.copyright);
-  return copyrightTemplate?.replace("${currentYear}", String(currentYear));
+  const copyrightTemplate = dict.copyright;
+  if (!copyrightTemplate || typeof copyrightTemplate !== 'string') {
+    return `版权所有 © ${currentYear} Nextify公司。保留所有权利。`;
+  }
+  return copyrightTemplate.replace("${currentYear}", String(currentYear));
 }
 
 export function SiteFooter({

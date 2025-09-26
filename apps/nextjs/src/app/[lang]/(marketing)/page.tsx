@@ -53,17 +53,19 @@ export default async function IndexPage({
       {/* 功能卡片区域 */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Icons.Image className="w-6 h-6 text-white" />
-              </div>
-              <CardTitle className="text-white">图片转提示词</CardTitle>
-              <CardDescription className="text-gray-400">
-                将图片转换为提示词，以生成您自己的图片
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <Link href={`/${lang}/image-to-prompt`}>
+            <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors cursor-pointer">
+              <CardHeader className="text-center">
+                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <Icons.Image className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-white">图片转提示词</CardTitle>
+                <CardDescription className="text-gray-400">
+                  将图片转换为提示词，以生成您自己的图片
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
 
           <Card className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
             <CardHeader className="text-center">
