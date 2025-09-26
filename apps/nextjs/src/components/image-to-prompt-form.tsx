@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 import { cn } from "@saasfly/ui";
 import { Button } from "@saasfly/ui/button";
@@ -9,7 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@saasfly/ui/card";
 import { Input } from "@saasfly/ui/input";
 import { Label } from "@saasfly/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@saasfly/ui/select";
+import { Switch } from "@saasfly/ui/switch";
 import * as Icons from "@saasfly/ui/icons";
+
+import { generatePromptFromImage } from "~/lib/coze-api";
 
 type AIModel = "general" | "flux" | "midjourney" | "stable-diffusion";
 type UploadMode = "upload" | "url";
@@ -27,6 +31,7 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [useConsistentMode, setUseConsistentMode] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const aiModels = [
@@ -63,6 +68,14 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log('用户选择的文件:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+        lastModifiedDate: new Date(file.lastModified).toISOString()
+      });
+      
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -76,6 +89,14 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
+      console.log('用户拖拽的文件:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+        lastModifiedDate: new Date(file.lastModified).toISOString()
+      });
+      
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -95,27 +116,116 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
     // 不再自动设置预览，等待用户点击获取图片按钮
   };
 
-  const handleFetchImage = () => {
-    if (imageUrl.trim()) {
-      setImagePreview(imageUrl);
+  const handleFetchImage = async () => {
+    try {
+      console.log("=== handleFetchImage 开始执行 ===");
+      console.log("当前 imageUrl:", imageUrl);
+      console.log("imageUrl.trim():", imageUrl.trim());
+      
+      if (!imageUrl.trim()) {
+        console.log("URL为空，显示警告");
+        alert("请输入有效的图片URL");
+        return;
+      }
+
+      try {
+        console.log("开始获取图片:", imageUrl);
+        console.log("清除 imageFile 状态");
+        
+        // 使用 React 的批量更新来避免状态冲突
+        const trimmedUrl = imageUrl.trim();
+        
+        // 先清除文件状态，然后设置URL预览
+        setImageFile(null);
+        
+        // 添加延迟确保状态更新完成
+        setTimeout(() => {
+          try {
+            console.log("设置图片预览:", trimmedUrl);
+            setImagePreview(trimmedUrl);
+            console.log("图片预览设置成功");
+            console.log("=== handleFetchImage 执行完成 ===");
+          } catch (error) {
+            console.error("setTimeout callback 发生错误:", error);
+          }
+        }, 0);
+        
+      } catch (error) {
+        console.error("=== handleFetchImage 发生错误 ===");
+        console.error("错误详情:", error);
+        console.error("错误堆栈:", error instanceof Error ? error.stack : "无堆栈信息");
+        alert("设置图片预览失败: " + (error instanceof Error ? error.message : String(error)));
+      }
+    } catch (error) {
+      console.error("handleFetchImage 外层错误:", error);
     }
   };
 
   const handleGenerate = async () => {
-    if (!imagePreview) return;
-    
+    if (!imagePreview && !imageUrl) {
+      toast.error('请先上传图片或输入图片URL');
+      return;
+    }
+
+    if (!selectedModel) {
+      toast.error('请选择AI模型');
+      return;
+    }
+
     setIsGenerating(true);
-    // 模拟API调用
-    setTimeout(() => {
-      const samplePrompts = {
-        general: "一幅现代数字艺术作品，展现了充满活力的色彩和抽象的几何形状，具有未来主义的设计风格。",
-        flux: "vibrant digital art, abstract geometric shapes, futuristic design, modern composition",
-        midjourney: "vibrant digital art, abstract geometric shapes, futuristic design, modern composition --ar 16:9 --v 6 --style raw",
-        "stable-diffusion": "vibrant digital art, abstract geometric shapes, futuristic design, modern composition, high quality, detailed, 8k resolution"
-      };
-      setGeneratedPrompt(samplePrompts[selectedModel]);
+    setGeneratedPrompt('');
+
+    try {
+      const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const timestamp = new Date().toISOString();
+      
+      console.log(`[${requestId}] 生成提示词请求开始`);
+      console.log(`[${requestId}] 请求时间:`, timestamp);
+      console.log(`[${requestId}] 图片来源:`, imageFile ? 'file' : 'url');
+      console.log(`[${requestId}] 图片值:`, imageFile ? `文件名: ${imageFile.name}, 大小: ${imageFile.size}` : imageUrl);
+      console.log(`[${requestId}] 选择的AI模型:`, selectedModel);
+      console.log(`[${requestId}] 启用缓存:`, useConsistentMode);
+
+      const formData = new FormData();
+      
+      if (imageFile) {
+        formData.append('image', imageFile);
+      } else if (imageUrl) {
+        formData.append('imageUrl', imageUrl);
+      }
+      
+      formData.append('aiModel', selectedModel);
+      formData.append('useCache', useConsistentMode.toString());
+
+      const response = await fetch('/api/generate-prompt', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate prompt');
+      }
+
+      const data = await response.json();
+      console.log(`[${requestId}] API响应:`, data);
+      
+      if (data.fromCache) {
+        console.log(`[${requestId}] 使用了缓存结果`);
+        toast.success('已返回缓存的提示词（保证一致性）');
+      } else {
+        console.log(`[${requestId}] 生成了新的提示词`);
+        toast.success('提示词生成成功');
+      }
+      
+      setGeneratedPrompt(data.prompt || '');
+      
+    } catch (error) {
+      console.error('生成提示词失败:', error);
+      toast.error(error instanceof Error ? error.message : '生成提示词失败');
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const copyToClipboard = () => {
@@ -236,6 +346,14 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
                     width={400}
                     height={300}
                     className="w-full h-full rounded-lg object-contain"
+                    onError={(e) => {
+                      console.error('Image load error:', e);
+                      console.error('Failed to load image:', imagePreview);
+                      setImagePreview(null);
+                    }}
+                    onLoad={() => {
+                      console.log('Image loaded successfully:', imagePreview);
+                    }}
                   />
                 </div>
               ) : (
@@ -308,7 +426,26 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
           </Select>
         </div>
 
-        {/* 第四行：生成按钮和查看历史 */}
+        {/* 第四行：一致性模式开关 */}
+        <div className="space-y-2">
+          <div className="flex items-center space-x-3">
+            <Switch
+              id="consistent-mode"
+              checked={useConsistentMode}
+              onCheckedChange={setUseConsistentMode}
+            />
+            <div>
+              <Label htmlFor="consistent-mode" className="text-white text-base font-medium cursor-pointer">
+                一致性模式
+              </Label>
+              <p className="text-gray-400 text-sm">
+                启用后，相同图片将返回一致的提示词结果（使用缓存）
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 第五行：生成按钮和查看历史 */}
         <div className="flex items-center space-x-4">
           <Button 
             className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 text-lg"
@@ -329,7 +466,7 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
           </Button>
         </div>
 
-        {/* 第五行：生成结果区域 */}
+        {/* 第六行：生成结果区域 */}
         <div>
           <Label className="text-white text-base font-medium mb-4 block">生成的提示词</Label>
           <div className="bg-slate-800/30 border border-slate-600 rounded-lg p-6">

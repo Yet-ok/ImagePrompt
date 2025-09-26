@@ -18,6 +18,7 @@ export const isPublicRoute = createRouteMatcher([
   new RegExp("/(\\w{2}/)?blog(.*)"),
   new RegExp("/(\\w{2}/)?pricing(.*)"),
   new RegExp("/(\\w{2}/)?image-to-prompt(.*)"), // 图片转提示词页面
+  new RegExp("/api/generate-prompt(.*)"), // API路由
   new RegExp("^/\\w{2}$"), // root with locale
 ]);
 

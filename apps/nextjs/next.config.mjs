@@ -32,6 +32,17 @@ const config = {
       "www.twillot.com",
       "cdnv2.ruguoapp.com",
       "www.setupyourpay.com",
+      "picsum.photos",
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
     ],
   },
   /** We already do linting and typechecking as separate tasks in CI */
