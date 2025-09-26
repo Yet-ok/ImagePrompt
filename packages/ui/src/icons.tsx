@@ -45,6 +45,7 @@ export const Image = Lucide.Image;
 export const Palette = Lucide.Palette;
 export const Bot = Lucide.Bot;
 export const Zap = Lucide.Zap;
+export const Link = Lucide.Link;
 
 export const System: Icon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>

@@ -92,8 +92,12 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
   const handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const url = event.target.value;
     setImageUrl(url);
-    if (url) {
-      setImagePreview(url);
+    // 不再自动设置预览，等待用户点击获取图片按钮
+  };
+
+  const handleFetchImage = () => {
+    if (imageUrl.trim()) {
+      setImagePreview(imageUrl);
     }
   };
 
@@ -138,11 +142,12 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
         </Button>
       </div>
 
-      <div className="space-y-8">
+      {/* 图片转提示词功能区域 */}
+      <div className="bg-slate-800/20 border border-slate-700/50 rounded-xl p-8 space-y-8">
         {/* 第一行：上传图片和图片预览 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* 左侧 - 图片上传区域 */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* 上传选项 */}
             <div className="flex space-x-1 bg-slate-800/50 p-1 rounded-lg">
               <Button 
@@ -173,23 +178,20 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
 
             {/* 图片上传区域 */}
             {uploadMode === "upload" ? (
-              <div className="bg-slate-800/30 border-2 border-dashed border-slate-600 rounded-lg p-8">
+              <div className="bg-slate-800/30 border-2 border-dashed border-slate-600 rounded-lg p-8 h-[300px] flex items-center justify-center">
                 <div 
-                  className="text-center cursor-pointer"
+                  className="text-center cursor-pointer w-full"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                    <Icons.Image className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 border-2 border-slate-400 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                    <Icons.Image className="w-8 h-8 text-slate-400" />
                   </div>
                   <h3 className="text-white font-medium mb-2">上传一张图片或拖拽上传</h3>
-                  <p className="text-gray-400 text-sm mb-4">
+                  <p className="text-gray-400 text-sm">
                     PNG, JPG 或 WEBP 格式，大小不超过 4MB
                   </p>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                    选择文件
-                  </Button>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -200,36 +202,45 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
                 </div>
               </div>
             ) : (
-              <div className="space-y-2">
-                <Label className="text-white">图片URL</Label>
-                <Input
-                  type="url"
-                  placeholder="输入图片URL..."
-                  value={imageUrl}
-                  onChange={handleUrlChange}
-                  className="bg-slate-800/50 border-slate-600 text-white"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-white">图片URL</Label>
+                  <Input
+                    type="url"
+                    placeholder="在这里粘贴您的图片链接"
+                    value={imageUrl}
+                    onChange={handleUrlChange}
+                    className="bg-slate-800/50 border-slate-600 text-white"
+                  />
+                </div>
+                <Button
+                  disabled={!imageUrl.trim()}
+                  onClick={handleFetchImage}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:text-slate-400"
+                >
+                  获取图片
+                </Button>
               </div>
             )}
           </div>
 
           {/* 右侧 - 图片预览区域 */}
-          <div>
-            <Label className="text-white text-base font-medium mb-4 block">图片预览</Label>
-            <div className="bg-slate-800/30 border border-slate-600 rounded-lg p-8">
+          <div className="space-y-4">
+            <Label className="text-white text-lg font-medium">图片预览</Label>
+            <div className="bg-slate-800/30 border border-slate-600 rounded-lg p-8 h-[300px] flex items-center justify-center">
               {imagePreview ? (
-                <div className="relative">
+                <div className="relative w-full h-full">
                   <Image
                     src={imagePreview}
                     alt="Preview"
                     width={400}
                     height={300}
-                    className="w-full h-auto rounded-lg object-cover"
+                    className="w-full h-full rounded-lg object-contain"
                   />
                 </div>
               ) : (
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-slate-700 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <div className="w-16 h-16 border-2 border-slate-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
                     <Icons.Image className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-400">您的图片将显示在这里</p>
@@ -244,33 +255,20 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
           <Label className="text-white text-base font-medium">选择 AI 模型</Label>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {aiModels.map((model) => {
-              const IconComponent = model.icon;
               const isSelected = selectedModel === model.id;
               return (
                 <div 
                   key={model.id}
                   className={cn(
-                    "bg-slate-800/50 border border-slate-600 rounded-lg p-4 cursor-pointer transition-all",
+                    "bg-slate-800/50 border border-slate-600 rounded-lg p-4 cursor-pointer transition-all relative",
                     isSelected 
                       ? "border-blue-500 bg-blue-600/10" 
                       : "hover:border-slate-500 hover:bg-slate-800/70"
                   )}
                   onClick={() => setSelectedModel(model.id)}
                 >
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center",
-                      model.color === "purple" && "bg-purple-600",
-                      model.color === "blue" && "bg-blue-600",
-                      model.color === "green" && "bg-green-600",
-                      model.color === "orange" && "bg-orange-600"
-                    )}>
-                      <IconComponent className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-white text-sm font-medium mb-1">{model.name}</h4>
-                      <p className="text-gray-400 text-xs">{model.description}</p>
-                    </div>
+                  {/* 选中状态图标 - 右上角 */}
+                  <div className="absolute top-2 right-2">
                     <div className={cn(
                       "w-4 h-4 border-2 rounded-full",
                       isSelected 
@@ -280,6 +278,13 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
                       {isSelected && (
                         <div className="w-full h-full rounded-full bg-white scale-50"></div>
                       )}
+                    </div>
+                  </div>
+                  
+                  <div className="text-left">
+                    <div>
+                      <h4 className="text-white text-base font-medium mb-1">{model.name}</h4>
+                      <p className="text-gray-400 text-xs">{model.description}</p>
                     </div>
                   </div>
                 </div>
