@@ -7,14 +7,13 @@ import {
   TRPCClientError,
 } from "@trpc/client";
 
-import { AppRouter } from "@saasfly/api";
+import type { AppRouter } from "@saasfly/api";
 
 import { transformer } from "./shared";
 import { observable } from "@trpc/server/observable";
 import { callProcedure } from "@trpc/server";
-import { TRPCErrorResponse } from "@trpc/server/rpc";
+import type { TRPCErrorResponse } from "@trpc/server/rpc";
 import { cache } from "react";
-import { appRouter } from "../../../../packages/api/src/root";
 import { auth } from "@clerk/nextjs/server";
 
 type AuthObject = Awaited<ReturnType<typeof auth>>;

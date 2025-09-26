@@ -1,121 +1,123 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadImageToCoze, uploadImageUrlToCoze, runCozeWorkflow, getPromptTypeFromAIModel } from '@/lib/coze-api';
+import { uploadImageToCoze, uploadImageUrlToCoze, runCozeWorkflow, getPromptTypeFromAIModel } from '~/lib/coze-api';
 import { 
   generateImageHash, 
   getCachedPrompt, 
   setCachedPrompt, 
   cleanExpiredCache,
   getCacheStats 
-} from '@/lib/prompt-cache';
+} from '~/lib/prompt-cache';
+
+interface CozeResponse {
+  success: boolean;
+  prompt?: string;
+  error?: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // 清理过期缓存
+    cleanExpiredCache();
+
     const formData = await request.formData();
     const image = formData.get('image') as File | null;
     const imageUrl = formData.get('imageUrl') as string | null;
     const aiModel = formData.get('aiModel') as string;
-    const useCache = formData.get('useCache') !== 'false'; // 默认启用缓存
-
-    if (!aiModel) {
-      return NextResponse.json({ error: 'AI model is required' }, { status: 400 });
-    }
+    const useCache = formData.get('useCache') === 'true';
 
     if (!image && !imageUrl) {
-      return NextResponse.json({ error: 'Either image file or image URL is required' }, { status: 400 });
+      return NextResponse.json({ error: '请提供图片文件或图片URL' }, { status: 400 });
     }
 
-    // 清理过期缓存
-    cleanExpiredCache();
-
-    // 生成图片哈希用于缓存
-    const imageSource = image || imageUrl!;
-    const imageHash = await generateImageHash(imageSource);
-    
-    console.log('图片哈希:', imageHash);
-    console.log('AI模型:', aiModel);
-    console.log('使用缓存:', useCache);
-    console.log('缓存统计:', getCacheStats());
-
-    // 检查缓存
-    if (useCache) {
-      const cachedPrompt = getCachedPrompt(imageHash, aiModel);
-      if (cachedPrompt) {
-        console.log('返回缓存的提示词，长度:', cachedPrompt.length);
-        return NextResponse.json({ 
-          prompt: cachedPrompt,
-          fromCache: true,
-          cacheStats: getCacheStats()
-        });
-      }
+    if (!aiModel) {
+      return NextResponse.json({ error: '请选择AI模型' }, { status: 400 });
     }
 
-    let fileId: string;
+    let imageHash: string;
+    let uploadResult: { success: boolean; file_id?: string; error?: string };
 
-    // 上传图片到 Coze
+    // 生成图片哈希值用于缓存
     if (image) {
-      console.log('Uploading image file to Coze...');
-      const uploadResult = await uploadImageToCoze(image);
-      if (uploadResult.code !== 0 || !uploadResult.data?.file_id) {
-        console.error('Image upload failed:', uploadResult);
-        return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+      const imageBuffer = Buffer.from(await image.arrayBuffer());
+      imageHash = generateImageHash(imageBuffer, aiModel);
+      
+      // 检查缓存
+      if (useCache) {
+        const cachedPrompt = getCachedPrompt(imageHash);
+        if (cachedPrompt) {
+          console.log('Cache hit for image hash:', imageHash);
+          return NextResponse.json({ 
+            success: true, 
+            prompt: cachedPrompt,
+            cached: true,
+            cacheStats: getCacheStats()
+          });
+        }
       }
-      fileId = uploadResult.data.file_id;
-      console.log('Image upload successful, file ID:', fileId);
+
+      // 上传图片到Coze
+      uploadResult = await uploadImageToCoze(image);
     } else if (imageUrl) {
-      console.log('Uploading image URL to Coze...');
-      const uploadResult = await uploadImageUrlToCoze(imageUrl);
-      if (uploadResult.code !== 0 || !uploadResult.data?.file_id) {
-        console.error('Image URL upload failed:', uploadResult);
-        return NextResponse.json({ error: 'Failed to upload image URL' }, { status: 500 });
+      // 对于URL，使用URL+模型作为哈希
+      imageHash = generateImageHash(Buffer.from(imageUrl), aiModel);
+      
+      // 检查缓存
+      if (useCache) {
+        const cachedPrompt = getCachedPrompt(imageHash);
+        if (cachedPrompt) {
+          console.log('Cache hit for image URL hash:', imageHash);
+          return NextResponse.json({ 
+            success: true, 
+            prompt: cachedPrompt,
+            cached: true,
+            cacheStats: getCacheStats()
+          });
+        }
       }
-      fileId = uploadResult.data.file_id;
-      console.log('Image URL upload successful, file ID:', fileId);
+
+      // 上传图片URL到Coze
+      uploadResult = await uploadImageUrlToCoze(imageUrl);
     } else {
-      return NextResponse.json({ error: 'No valid image source provided' }, { status: 400 });
+      return NextResponse.json({ error: '未提供有效的图片' }, { status: 400 });
     }
 
-    // 获取 PromptType
+    if (!uploadResult.success || !uploadResult.file_id) {
+      return NextResponse.json({ 
+        error: uploadResult.error || '图片上传失败' 
+      }, { status: 500 });
+    }
+
+    // 获取提示词类型
     const promptType = getPromptTypeFromAIModel(aiModel);
-    console.log('Prompt type:', promptType);
 
-    // 调用工作流
-    console.log('调用工作流，参数:', { promptType, imageFileId: fileId });
-    const workflowResult = await runCozeWorkflow(promptType, fileId);
+    // 运行Coze工作流
+    const workflowResult = await runCozeWorkflow(uploadResult.file_id, promptType);
 
-    if (workflowResult.code !== 0) {
-      console.error('工作流执行失败:', workflowResult);
-      return NextResponse.json({ error: 'Failed to generate prompt' }, { status: 500 });
+    if (!workflowResult.success) {
+      return NextResponse.json({ 
+        error: workflowResult.error || '工作流执行失败' 
+      }, { status: 500 });
     }
 
-    console.log('工作流执行成功:', workflowResult);
-
-    // 解析输出
-    let output = '';
-    if (workflowResult.data) {
-      try {
-        const parsedData = JSON.parse(workflowResult.data);
-        output = parsedData.output || '';
-      } catch (parseError) {
-        console.error('Failed to parse workflow output:', parseError);
-        output = workflowResult.data;
-      }
-    }
+    const prompt = workflowResult.prompt;
 
     // 缓存结果
-    if (useCache && output) {
-      setCachedPrompt(imageHash, aiModel, output);
+    if (useCache && prompt) {
+      setCachedPrompt(imageHash, prompt);
+      console.log('Cached prompt for hash:', imageHash);
     }
 
     return NextResponse.json({ 
-      prompt: output,
-      debug_url: workflowResult.debug_url,
-      fromCache: false,
-      imageHash: imageHash.substring(0, 16), // 只返回前16位用于调试
+      success: true, 
+      prompt,
+      cached: false,
       cacheStats: getCacheStats()
     });
 
   } catch (error) {
-    console.error('Error in generate-prompt API:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Generate prompt error:', error);
+    return NextResponse.json({ 
+      error: '服务器内部错误' 
+    }, { status: 500 });
   }
 }
