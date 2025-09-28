@@ -39,7 +39,8 @@ const config = {
     return config;
   },
   env: {
-    SKIP_DB_CONNECTION: process.env.NODE_ENV === 'production' ? 'true' : 'false',
+    SKIP_DB_CONNECTION:
+      process.env.NODE_ENV === "production" ? "true" : "false",
   },
   images: {
     domains: [
@@ -52,12 +53,12 @@ const config = {
     ],
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
       {
-        protocol: 'http',
-        hostname: '**',
+        protocol: "http",
+        hostname: "**",
       },
     ],
   },

@@ -9,7 +9,13 @@ import { Button } from "@saasfly/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@saasfly/ui/card";
 import { Input } from "@saasfly/ui/input";
 import { Label } from "@saasfly/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@saasfly/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@saasfly/ui/select";
 import { Switch } from "@saasfly/ui/switch";
 import * as Icons from "@saasfly/ui/icons";
 
@@ -68,14 +74,14 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log('用户选择的文件:', {
+      console.log("用户选择的文件:", {
         name: file.name,
         size: file.size,
         type: file.type,
         lastModified: file.lastModified,
-        lastModifiedDate: new Date(file.lastModified).toISOString()
+        lastModifiedDate: new Date(file.lastModified).toISOString(),
       });
-      
+
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -89,14 +95,14 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
-      console.log('用户拖拽的文件:', {
+      console.log("用户拖拽的文件:", {
         name: file.name,
         size: file.size,
         type: file.type,
         lastModified: file.lastModified,
-        lastModifiedDate: new Date(file.lastModified).toISOString()
+        lastModifiedDate: new Date(file.lastModified).toISOString(),
       });
-      
+
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -121,7 +127,7 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
       console.log("=== handleFetchImage 开始执行 ===");
       console.log("当前 imageUrl:", imageUrl);
       console.log("imageUrl.trim():", imageUrl.trim());
-      
+
       if (!imageUrl.trim()) {
         console.log("URL为空，显示警告");
         alert("请输入有效的图片URL");
@@ -131,13 +137,13 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
       try {
         console.log("开始获取图片:", imageUrl);
         console.log("清除 imageFile 状态");
-        
+
         // 使用 React 的批量更新来避免状态冲突
         const trimmedUrl = imageUrl.trim();
-        
+
         // 先清除文件状态，然后设置URL预览
         setImageFile(null);
-        
+
         // 添加延迟确保状态更新完成
         setTimeout(() => {
           try {
@@ -149,12 +155,17 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
             console.error("setTimeout callback 发生错误:", error);
           }
         }, 0);
-        
       } catch (error) {
         console.error("=== handleFetchImage 发生错误 ===");
         console.error("错误详情:", error);
-        console.error("错误堆栈:", error instanceof Error ? error.stack : "无堆栈信息");
-        alert("设置图片预览失败: " + (error instanceof Error ? error.message : String(error)));
+        console.error(
+          "错误堆栈:",
+          error instanceof Error ? error.stack : "无堆栈信息",
+        );
+        alert(
+          "设置图片预览失败: " +
+            (error instanceof Error ? error.message : String(error)),
+        );
       }
     } catch (error) {
       console.error("handleFetchImage 外层错误:", error);
@@ -163,66 +174,70 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
 
   const handleGenerate = async () => {
     if (!imagePreview && !imageUrl) {
-      toast.error('请先上传图片或输入图片URL');
+      toast.error("请先上传图片或输入图片URL");
       return;
     }
 
     if (!selectedModel) {
-      toast.error('请选择AI模型');
+      toast.error("请选择AI模型");
       return;
     }
 
     setIsGenerating(true);
-    setGeneratedPrompt('');
+    setGeneratedPrompt("");
 
     try {
       const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const timestamp = new Date().toISOString();
-      
+
       console.log(`[${requestId}] 生成提示词请求开始`);
       console.log(`[${requestId}] 请求时间:`, timestamp);
-      console.log(`[${requestId}] 图片来源:`, imageFile ? 'file' : 'url');
-      console.log(`[${requestId}] 图片值:`, imageFile ? `文件名: ${imageFile.name}, 大小: ${imageFile.size}` : imageUrl);
+      console.log(`[${requestId}] 图片来源:`, imageFile ? "file" : "url");
+      console.log(
+        `[${requestId}] 图片值:`,
+        imageFile
+          ? `文件名: ${imageFile.name}, 大小: ${imageFile.size}`
+          : imageUrl,
+      );
       console.log(`[${requestId}] 选择的AI模型:`, selectedModel);
       console.log(`[${requestId}] 启用缓存:`, useConsistentMode);
 
       const formData = new FormData();
-      
-      if (imageFile) {
-        formData.append('image', imageFile);
-      } else if (imageUrl) {
-        formData.append('imageUrl', imageUrl);
-      }
-      
-      formData.append('aiModel', selectedModel);
-      formData.append('useCache', useConsistentMode.toString());
 
-      const response = await fetch('/api/generate-prompt', {
-        method: 'POST',
+      if (imageFile) {
+        formData.append("image", imageFile);
+      } else if (imageUrl) {
+        formData.append("imageUrl", imageUrl);
+      }
+
+      formData.append("aiModel", selectedModel);
+      formData.append("useCache", useConsistentMode.toString());
+
+      const response = await fetch("/api/generate-prompt", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate prompt');
+        throw new Error(errorData.error || "Failed to generate prompt");
       }
 
       const data = await response.json();
       console.log(`[${requestId}] API响应:`, data);
-      
+
       if (data.fromCache) {
         console.log(`[${requestId}] 使用了缓存结果`);
-        toast.success('已返回缓存的提示词（保证一致性）');
+        toast.success("已返回缓存的提示词（保证一致性）");
       } else {
         console.log(`[${requestId}] 生成了新的提示词`);
-        toast.success('提示词生成成功');
+        toast.success("提示词生成成功");
       }
-      
-      setGeneratedPrompt(data.prompt || '');
-      
+
+      setGeneratedPrompt(data.prompt || "");
     } catch (error) {
-      console.error('生成提示词失败:', error);
-      toast.error(error instanceof Error ? error.message : '生成提示词失败');
+      console.error("生成提示词失败:", error);
+      toast.error(error instanceof Error ? error.message : "生成提示词失败");
     } finally {
       setIsGenerating(false);
     }
@@ -236,14 +251,14 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
     <div className={cn("max-w-6xl mx-auto", className)}>
       {/* 标签页导航 */}
       <div className="flex space-x-1 mb-8 bg-slate-800/30 p-1 rounded-lg w-fit mx-auto">
-        <Button 
+        <Button
           variant="ghost"
           className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md"
         >
           <Icons.Image className="w-4 h-4 mr-2" />
           图片转提示词
         </Button>
-        <Button 
+        <Button
           variant="ghost"
           className="text-gray-400 hover:text-white hover:bg-slate-700 px-6 py-2 rounded-md"
         >
@@ -260,25 +275,25 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
           <div className="space-y-4">
             {/* 上传选项 */}
             <div className="flex space-x-1 bg-slate-800/50 p-1 rounded-lg">
-              <Button 
+              <Button
                 variant="ghost"
                 className={cn(
                   "flex-1 rounded-md",
-                  uploadMode === "upload" 
-                    ? "bg-slate-700 text-white" 
-                    : "text-gray-400 hover:text-white hover:bg-slate-700"
+                  uploadMode === "upload"
+                    ? "bg-slate-700 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-slate-700",
                 )}
                 onClick={() => setUploadMode("upload")}
               >
                 上传图片
               </Button>
-              <Button 
+              <Button
                 variant="ghost"
                 className={cn(
                   "flex-1 rounded-md",
-                  uploadMode === "url" 
-                    ? "bg-slate-700 text-white" 
-                    : "text-gray-400 hover:text-white hover:bg-slate-700"
+                  uploadMode === "url"
+                    ? "bg-slate-700 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-slate-700",
                 )}
                 onClick={() => setUploadMode("url")}
               >
@@ -289,7 +304,7 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
             {/* 图片上传区域 */}
             {uploadMode === "upload" ? (
               <div className="bg-slate-800/30 border-2 border-dashed border-slate-600 rounded-lg p-8 h-[300px] flex items-center justify-center">
-                <div 
+                <div
                   className="text-center cursor-pointer w-full"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
@@ -298,7 +313,9 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
                   <div className="w-16 h-16 border-2 border-slate-400 rounded-lg flex items-center justify-center mb-4 mx-auto">
                     <Icons.Image className="w-8 h-8 text-slate-400" />
                   </div>
-                  <h3 className="text-white font-medium mb-2">上传一张图片或拖拽上传</h3>
+                  <h3 className="text-white font-medium mb-2">
+                    上传一张图片或拖拽上传
+                  </h3>
                   <p className="text-gray-400 text-sm">
                     PNG, JPG 或 WEBP 格式，大小不超过 4MB
                   </p>
@@ -347,12 +364,12 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
                     height={300}
                     className="w-full h-full rounded-lg object-contain"
                     onError={(e) => {
-                      console.error('Image load error:', e);
-                      console.error('Failed to load image:', imagePreview);
+                      console.error("Image load error:", e);
+                      console.error("Failed to load image:", imagePreview);
                       setImagePreview(null);
                     }}
                     onLoad={() => {
-                      console.log('Image loaded successfully:', imagePreview);
+                      console.log("Image loaded successfully:", imagePreview);
                     }}
                   />
                 </div>
@@ -370,39 +387,47 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
 
         {/* 第二行：AI模型选择 */}
         <div className="space-y-4">
-          <Label className="text-white text-base font-medium">选择 AI 模型</Label>
+          <Label className="text-white text-base font-medium">
+            选择 AI 模型
+          </Label>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {aiModels.map((model) => {
               const isSelected = selectedModel === model.id;
               return (
-                <div 
+                <div
                   key={model.id}
                   className={cn(
                     "bg-slate-800/50 border border-slate-600 rounded-lg p-4 cursor-pointer transition-all relative",
-                    isSelected 
-                      ? "border-blue-500 bg-blue-600/10" 
-                      : "hover:border-slate-500 hover:bg-slate-800/70"
+                    isSelected
+                      ? "border-blue-500 bg-blue-600/10"
+                      : "hover:border-slate-500 hover:bg-slate-800/70",
                   )}
                   onClick={() => setSelectedModel(model.id)}
                 >
                   {/* 选中状态图标 - 右上角 */}
                   <div className="absolute top-2 right-2">
-                    <div className={cn(
-                      "w-4 h-4 border-2 rounded-full",
-                      isSelected 
-                        ? "border-blue-500 bg-blue-500" 
-                        : "border-slate-500"
-                    )}>
+                    <div
+                      className={cn(
+                        "w-4 h-4 border-2 rounded-full",
+                        isSelected
+                          ? "border-blue-500 bg-blue-500"
+                          : "border-slate-500",
+                      )}
+                    >
                       {isSelected && (
                         <div className="w-full h-full rounded-full bg-white scale-50"></div>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="text-left">
                     <div>
-                      <h4 className="text-white text-base font-medium mb-1">{model.name}</h4>
-                      <p className="text-gray-400 text-xs">{model.description}</p>
+                      <h4 className="text-white text-base font-medium mb-1">
+                        {model.name}
+                      </h4>
+                      <p className="text-gray-400 text-xs">
+                        {model.description}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -419,9 +444,15 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="english" className="text-white">English</SelectItem>
-              <SelectItem value="chinese" className="text-white">中文</SelectItem>
-              <SelectItem value="japanese" className="text-white">日本語</SelectItem>
+              <SelectItem value="english" className="text-white">
+                English
+              </SelectItem>
+              <SelectItem value="chinese" className="text-white">
+                中文
+              </SelectItem>
+              <SelectItem value="japanese" className="text-white">
+                日本語
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -435,7 +466,10 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
               onCheckedChange={setUseConsistentMode}
             />
             <div>
-              <Label htmlFor="consistent-mode" className="text-white text-base font-medium cursor-pointer">
+              <Label
+                htmlFor="consistent-mode"
+                className="text-white text-base font-medium cursor-pointer"
+              >
                 一致性模式
               </Label>
               <p className="text-gray-400 text-sm">
@@ -447,7 +481,7 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
 
         {/* 第五行：生成按钮和查看历史 */}
         <div className="flex items-center space-x-4">
-          <Button 
+          <Button
             className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 text-lg"
             onClick={handleGenerate}
             disabled={!imagePreview || isGenerating}
@@ -461,14 +495,19 @@ export function ImageToPromptForm({ className }: ImageToPromptFormProps) {
               "生成提示词"
             )}
           </Button>
-          <Button variant="link" className="text-purple-400 hover:text-purple-300">
+          <Button
+            variant="link"
+            className="text-purple-400 hover:text-purple-300"
+          >
             查看历史
           </Button>
         </div>
 
         {/* 第六行：生成结果区域 */}
         <div>
-          <Label className="text-white text-base font-medium mb-4 block">生成的提示词</Label>
+          <Label className="text-white text-base font-medium mb-4 block">
+            生成的提示词
+          </Label>
           <div className="bg-slate-800/30 border border-slate-600 rounded-lg p-6">
             {generatedPrompt ? (
               <div className="space-y-4">

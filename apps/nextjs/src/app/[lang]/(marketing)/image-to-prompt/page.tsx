@@ -10,7 +10,8 @@ import type { Locale } from "~/config/i18n-config";
 
 export const metadata: Metadata = {
   title: "图片转提示词 - AI驱动的图片分析工具",
-  description: "使用AI技术分析图片内容，生成高质量的提示词，支持多种AI模型格式。",
+  description:
+    "使用AI技术分析图片内容，生成高质量的提示词，支持多种AI模型格式。",
 };
 
 export default async function ImageToPromptPage({ params }: LangProps) {
@@ -35,10 +36,7 @@ export default async function ImageToPromptPage({ params }: LangProps) {
         </div>
       </main>
 
-      <SiteFooter
-        params={{ lang: params.lang }}
-        dict={dict.common}
-      />
+      <SiteFooter params={{ lang: params.lang }} dict={dict.common} />
     </div>
   );
 }

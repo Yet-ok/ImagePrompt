@@ -9,13 +9,13 @@ export default function DebugEnvPage() {
         <div>
           <strong>COZE_PERSONAL_TOKEN:</strong>
           <p className="font-mono bg-gray-100 p-2 rounded">
-            {cozeToken ? `${cozeToken.substring(0, 10)}...` : 'NOT FOUND'}
+            {cozeToken ? `${cozeToken.substring(0, 10)}...` : "NOT FOUND"}
           </p>
         </div>
         <div>
           <strong>NEXT_PUBLIC_COZE_WORKFLOW_ID:</strong>
           <p className="font-mono bg-gray-100 p-2 rounded">
-            {workflowId || 'NOT FOUND'}
+            {workflowId ?? "NOT FOUND"}
           </p>
         </div>
       </div>

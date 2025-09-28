@@ -79,8 +79,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // Only use ClerkProvider if publishable key is available
-  const hasClerkKey = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                      env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim() !== '';
+  const hasClerkKey =
+    env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+    (env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY as string).trim() !== "";
 
   const content = (
     <html lang="en" suppressHydrationWarning>
@@ -110,11 +111,5 @@ export default function RootLayout({
     </html>
   );
 
-  return hasClerkKey ? (
-    <ClerkProvider>
-      {content}
-    </ClerkProvider>
-  ) : (
-    content
-  );
+  return hasClerkKey ? <ClerkProvider>{content}</ClerkProvider> : content;
 }

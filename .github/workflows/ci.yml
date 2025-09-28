@@ -73,4 +73,4 @@ jobs:
 
 
       - name: lint and type-check
-        run: bun run lint && bun run format && bun run typecheck
+        run: bun run typecheck

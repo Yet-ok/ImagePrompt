@@ -1,11 +1,10 @@
 import { match as matchLocale } from "@formatjs/intl-localematcher";
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { createRouteMatcher } from "@clerk/nextjs/server";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import Negotiator from "negotiator";
 
 import { i18n } from "~/config/i18n-config";
-import { env } from "@saasfly/auth/env.mjs";
 
 const noNeedProcessRoute = [".*\\.png", ".*\\.jpg", ".*\\.opengraph-image.png"];
 
@@ -47,7 +46,7 @@ export function isNoNeedProcess(request: NextRequest): boolean {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-export const middleware = async (req: NextRequest) => {
+export const middleware = (req: NextRequest) => {
   if (isNoNeedProcess(req)) {
     return null;
   }

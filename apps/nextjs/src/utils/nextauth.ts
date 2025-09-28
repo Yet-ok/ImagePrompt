@@ -2,7 +2,6 @@ import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { NextResponse } from "next/server";
 import type { NextRequest, NextFetchEvent } from "next/server";
 import Negotiator from "negotiator";
-import { getCurrentUser } from "@saasfly/auth";
 import { withAuth } from "next-auth/middleware";
 import { getToken } from "next-auth/jwt";
 
@@ -49,8 +48,12 @@ function isNoNeedProcess(request: NextRequest): boolean {
   return noNeedProcessRoute.some((route) => new RegExp(route).test(pathname));
 }
 
+interface NextRequestWithAuth extends NextRequest {
+  nextauth?: unknown;
+}
+
 const authMiddleware = withAuth(
-  async function middlewares(req: NextRequest & { nextauth?: any }) {
+  async function middlewares(req: NextRequestWithAuth) {
     const token = await getToken({ req });
     const isAuth = !!token;
     const isAdmin = token?.isAdmin;
@@ -100,7 +103,10 @@ const authMiddleware = withAuth(
  * @param request
  * @returns
  */
-export default async function middleware(request: NextRequest, event: NextFetchEvent) {
+export default async function middleware(
+  request: NextRequest,
+  event: NextFetchEvent,
+) {
   if (isNoNeedProcess(request)) {
     return null;
   }
@@ -128,5 +134,5 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   if (isPublicPage(request)) {
     return null;
   }
-  return authMiddleware(request as any, event);
+  return authMiddleware(request as NextRequestWithAuth, event);
 }

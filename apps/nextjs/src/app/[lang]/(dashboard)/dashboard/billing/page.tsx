@@ -18,7 +18,7 @@ export const metadata = {
 };
 
 // Force dynamic rendering to avoid static generation issues
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface Subscription {
   plan: string | null;
@@ -61,16 +61,18 @@ function generateSubscriptionMessage(
 
 async function SubscriptionCard({ dict }: { dict: Record<string, string> }) {
   let subscription: Subscription | null = null;
-  
+
   try {
     subscription = (await trpc.auth.mySubscription.query()) as Subscription;
   } catch (error) {
-    console.warn('Failed to fetch subscription:', error);
+    console.warn("Failed to fetch subscription:", error);
     // Fallback to null subscription
   }
-  
-  const content = subscription ? generateSubscriptionMessage(dict, subscription) : "";
-  
+
+  const content = subscription
+    ? generateSubscriptionMessage(dict, subscription)
+    : "";
+
   return (
     <Card>
       <CardHeader>
