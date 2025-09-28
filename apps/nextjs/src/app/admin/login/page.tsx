@@ -55,7 +55,7 @@ export default function LoginPage() {
           <div className="mt-20 flex items-center justify-between">
             <CardItem
               translateZ={20}
-              as={Link}
+              as="a"
               href="https://github.com/saasfly/saasfly"
               target="__blank"
               className="rounded-xl px-4 py-2 text-xs font-normal dark:text-white"

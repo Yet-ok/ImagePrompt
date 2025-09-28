@@ -1,4 +1,5 @@
 import { getSessionUser } from "./clerk";
+export { authOptions, auth, getCurrentUser } from "./nextauth";
 
 export interface User {
   id: string;
@@ -14,14 +15,4 @@ declare global {
       isAdmin: boolean;
     }
   }
-}
-
-export const authOptions = {
-  pages: {
-    signIn: "/login-clerk",
-  },
-}
-
-export async function getCurrentUser() {
-  return await getSessionUser();
 }

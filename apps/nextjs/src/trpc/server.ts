@@ -8,6 +8,7 @@ import {
 } from "@trpc/client";
 
 import type { AppRouter } from "@saasfly/api";
+import { appRouter } from "@saasfly/api";
 
 import { transformer } from "./shared";
 import { observable } from "@trpc/server/observable";

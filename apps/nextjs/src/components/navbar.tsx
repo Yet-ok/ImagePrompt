@@ -62,9 +62,9 @@ export function NavBar({
 
         <div className="flex items-center space-x-3">
           <ModeToggle />
-          <LocaleChange />
+          <LocaleChange url="" />
           {user ? (
-            <UserAccountNav user={user} />
+            <UserAccountNav user={user} params={{ lang }} dict={dropdown} />
           ) : (
             <div className="flex items-center space-x-3">
               <Button
@@ -73,14 +73,14 @@ export function NavBar({
                 size="sm"
                 onClick={() => signInModal.onOpen()}
               >
-                {marketing.login}
+                {String(marketing.login)}
               </Button>
               <Button
                 className="px-3"
                 size="sm"
                 onClick={() => signInModal.onOpen()}
               >
-                {marketing.signup}
+                {String(marketing.signup)}
               </Button>
             </div>
           )}

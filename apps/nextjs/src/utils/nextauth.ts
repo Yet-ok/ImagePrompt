@@ -1,8 +1,10 @@
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextFetchEvent } from "next/server";
 import Negotiator from "negotiator";
-import { auth } from "@saasfly/auth";
+import { getCurrentUser } from "@saasfly/auth";
+import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt";
 
 import { i18n } from "~/config/i18n-config";
 
@@ -48,7 +50,7 @@ function isNoNeedProcess(request: NextRequest): boolean {
 }
 
 const authMiddleware = withAuth(
-  async function middlewares(req) {
+  async function middlewares(req: NextRequest & { nextauth?: any }) {
     const token = await getToken({ req });
     const isAuth = !!token;
     const isAdmin = token?.isAdmin;
@@ -98,7 +100,7 @@ const authMiddleware = withAuth(
  * @param request
  * @returns
  */
-export default async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest, event: NextFetchEvent) {
   if (isNoNeedProcess(request)) {
     return null;
   }
@@ -126,7 +128,5 @@ export default async function middleware(request: NextRequest) {
   if (isPublicPage(request)) {
     return null;
   }
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  return authMiddleware(request, null);
+  return authMiddleware(request as any, event);
 }

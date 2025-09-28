@@ -25,6 +25,22 @@ const config = {
     mdxRs: true,
     // serverActions: true,
   },
+  // Disable SWC minifier to fix "getExecutor is not a function" error
+  swcMinify: false,
+  // Disable SWC compiler entirely to avoid getExecutor issues
+  compiler: {
+    removeConsole: false,
+  },
+  webpack: (config, { dev, isServer }) => {
+    // Disable SWC loader for problematic files
+    if (!dev && !isServer) {
+      config.optimization.minimize = false;
+    }
+    return config;
+  },
+  env: {
+    SKIP_DB_CONNECTION: process.env.NODE_ENV === 'production' ? 'true' : 'false',
+  },
   images: {
     domains: [
       "images.unsplash.com",

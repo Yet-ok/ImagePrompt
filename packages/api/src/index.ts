@@ -6,6 +6,8 @@ export { createTRPCContext } from "./trpc";
 
 export { t } from "./trpc";
 
+export { appRouter } from "./root";
+
 export type { AppRouter } from "./root";
 
 /**

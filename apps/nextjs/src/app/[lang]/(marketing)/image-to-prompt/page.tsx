@@ -6,6 +6,7 @@ import { MainNav } from "~/components/main-nav";
 import { SiteFooter } from "~/components/site-footer";
 import { getDictionary } from "~/lib/get-dictionary";
 import { LangProps } from "~/types";
+import type { Locale } from "~/config/i18n-config";
 
 export const metadata: Metadata = {
   title: "图片转提示词 - AI驱动的图片分析工具",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ImageToPromptPage({ params }: LangProps) {
-  const dict = await getDictionary(params.lang);
+  const dict = await getDictionary(params.lang as Locale);
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">

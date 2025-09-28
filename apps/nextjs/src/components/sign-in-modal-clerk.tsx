@@ -19,7 +19,16 @@ export const SignInClerkModal = ({
 }) => {
   const signInModal = useSigninModal();
   const [signInClicked, setSignInClicked] = useState(false);
-  const { signIn } = useSignIn();
+  
+  // Add error boundary for Clerk hooks
+  let signIn;
+  try {
+    const result = useSignIn();
+    signIn = result?.signIn;
+  } catch (error) {
+    console.warn("Clerk not properly configured:", error);
+    return null;
+  }
 
   if (!signIn) {
     return null;

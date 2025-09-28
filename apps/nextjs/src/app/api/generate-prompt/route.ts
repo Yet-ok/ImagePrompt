@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadImageToCoze, uploadImageUrlToCoze, runCozeWorkflow, getPromptTypeFromAIModel } from '~/lib/coze-api';
+import { uploadImageToCoze, uploadImageUrlToCoze, runCozeWorkflow, getPromptTypeFromAIModel, CozeUploadResponse } from '~/lib/coze-api';
 import { 
   generateImageHash, 
   getCachedPrompt, 
@@ -34,16 +34,15 @@ export async function POST(request: NextRequest) {
     }
 
     let imageHash: string;
-    let uploadResult: { success: boolean; file_id?: string; error?: string };
+    let uploadResult: CozeUploadResponse;
 
     // 生成图片哈希值用于缓存
     if (image) {
-      const imageBuffer = Buffer.from(await image.arrayBuffer());
-      imageHash = generateImageHash(imageBuffer, aiModel);
-      
-      // 检查缓存
-      if (useCache) {
-        const cachedPrompt = getCachedPrompt(imageHash);
+        imageHash = await generateImageHash(image);
+        
+        // 检查缓存
+        if (useCache) {
+          const cachedPrompt = getCachedPrompt(imageHash, aiModel);
         if (cachedPrompt) {
           console.log('Cache hit for image hash:', imageHash);
           return NextResponse.json({ 
@@ -58,12 +57,12 @@ export async function POST(request: NextRequest) {
       // 上传图片到Coze
       uploadResult = await uploadImageToCoze(image);
     } else if (imageUrl) {
-      // 对于URL，使用URL+模型作为哈希
-      imageHash = generateImageHash(Buffer.from(imageUrl), aiModel);
+      // 对于URL，使用URL作为哈希
+      imageHash = await generateImageHash(imageUrl);
       
       // 检查缓存
       if (useCache) {
-        const cachedPrompt = getCachedPrompt(imageHash);
+        const cachedPrompt = getCachedPrompt(imageHash, aiModel);
         if (cachedPrompt) {
           console.log('Cache hit for image URL hash:', imageHash);
           return NextResponse.json({ 
@@ -81,9 +80,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '未提供有效的图片' }, { status: 400 });
     }
 
-    if (!uploadResult.success || !uploadResult.file_id) {
+    if (uploadResult.code !== 0) {
       return NextResponse.json({ 
-        error: uploadResult.error || '图片上传失败' 
+        error: uploadResult.msg || '图片上传失败' 
+      }, { status: 500 });
+    }
+
+    if (!uploadResult.data?.file_id) {
+      return NextResponse.json({ 
+        error: '上传成功但未获取到文件ID' 
       }, { status: 500 });
     }
 
@@ -91,19 +96,19 @@ export async function POST(request: NextRequest) {
     const promptType = getPromptTypeFromAIModel(aiModel);
 
     // 运行Coze工作流
-    const workflowResult = await runCozeWorkflow(uploadResult.file_id, promptType);
+    const workflowResult = await runCozeWorkflow(promptType, uploadResult.data.file_id);
 
-    if (!workflowResult.success) {
+    if (workflowResult.code !== 0) {
       return NextResponse.json({ 
-        error: workflowResult.error || '工作流执行失败' 
+        error: workflowResult.msg || '工作流执行失败' 
       }, { status: 500 });
     }
 
-    const prompt = workflowResult.prompt;
+    const prompt = workflowResult.data?.output;
 
     // 缓存结果
     if (useCache && prompt) {
-      setCachedPrompt(imageHash, prompt);
+      setCachedPrompt(imageHash, aiModel, prompt);
       console.log('Cached prompt for hash:', imageHash);
     }
 
