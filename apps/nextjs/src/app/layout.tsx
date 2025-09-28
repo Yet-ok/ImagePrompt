@@ -15,6 +15,7 @@ import { TailwindIndicator } from "~/components/tailwind-indicator";
 import { ThemeProvider } from "~/components/theme-provider";
 import { i18n } from "~/config/i18n-config";
 import { siteConfig } from "~/config/site";
+import { env } from "~/env.mjs";
 
 // import { Suspense } from "react";
 // import { PostHogPageview } from "~/config/providers";
@@ -77,33 +78,43 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        {/*<Suspense>*/}
-        {/*  <PostHogPageview />*/}
-        {/*</Suspense>*/}
-        <body
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable,
-            fontHeading.variable,
-          )}
+  // Only use ClerkProvider if publishable key is available
+  const hasClerkKey = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
+                      env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim() !== '';
+
+  const content = (
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      {/*<Suspense>*/}
+      {/*  <PostHogPageview />*/}
+      {/*</Suspense>*/}
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable,
+          fontHeading.variable,
+        )}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
-          >
-            <NextDevtoolsProvider>{children}</NextDevtoolsProvider>
-            <Analytics />
-            <SpeedInsights />
-            <Toaster />
-            <TailwindIndicator />
-          </ThemeProvider>
-        </body>
-      </html>
+          <NextDevtoolsProvider>{children}</NextDevtoolsProvider>
+          <Analytics />
+          <SpeedInsights />
+          <Toaster />
+          <TailwindIndicator />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+
+  return hasClerkKey ? (
+    <ClerkProvider>
+      {content}
     </ClerkProvider>
+  ) : (
+    content
   );
 }

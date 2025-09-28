@@ -37,10 +37,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Copy env
-        shell: bash
         run: |
           cp .env.example .env.local
-          echo "POSTGRES_URL=postgres://default:default@localhost:5432/verceldb" >> .env.local
+          echo "POSTGRES_URL=postgresql://postgres:postgres@localhost:5432/postgres" >> .env.local
+          echo "NEXTAUTH_SECRET=your-nextauth-secret-key-here-min-32-chars" >> .env.local
+          echo "GITHUB_CLIENT_ID=github_client_id_placeholder" >> .env.local
+          echo "GITHUB_CLIENT_SECRET=github_client_secret_placeholder" >> .env.local
+          echo "STRIPE_API_KEY=sk_test_stripe_api_key_placeholder" >> .env.local
+          echo "STRIPE_WEBHOOK_SECRET=whsec_stripe_webhook_secret_placeholder" >> .env.local
+          echo "NEXT_PUBLIC_POSTHOG_KEY=phc_posthog_key_placeholder" >> .env.local
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=" >> .env.local
+          echo "CLERK_SECRET_KEY=" >> .env.local
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v1
@@ -61,6 +68,8 @@ jobs:
           POSTGRES_PASSWORD: default
           POSTGRES_DB: verceldb
           POSTGRES_URL: postgres://default:default@localhost:5432/verceldb
+          # Skip database connection during build
+          SKIP_DB_CONNECTION: true
 
 
       - name: lint and type-check
